@@ -162,7 +162,7 @@ When two bodies overlap, they **merge inelastically**:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/celestial-sandbox.git
+git clone https://github.com/rendragonnn/celestial-sandbox.git
 cd celestial-sandbox
 
 # Install dependencies
