@@ -8,6 +8,10 @@ A visually stunning, physically accurate interactive gravity sandbox that simula
 
 ![Celestial Sandbox Banner](https://img.shields.io/badge/🚀-Celestial_Sandbox-blueviolet?style=for-the-badge)
 
+<p align="center">
+  <img src="screenshots/1.png" alt="Celestial Sandbox Preview" width="800">
+</p>
+
 ---
 
 ## 🔭 Overview
@@ -137,12 +141,13 @@ When two bodies overlap, they **merge inelastically**:
 
 ## 📸 Screenshots
 
-```
-screenshots/
-├── 1.png
-├── 2.png
-├── 3.png
-```
+<p align="center">
+  <img src="screenshots/1.png" width="45%" alt="Binary Star System">
+  <img src="screenshots/2.png" width="45%" alt="Spiral Galaxy Simulation">
+</p>
+<p align="center">
+  <img src="screenshots/3.png" width="90%" alt="Chaotic Cluster Interaction">
+</p>
 
 ---
 
@@ -238,4 +243,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-\*Built with -rendr4goon/\!!
+\*Built with Love My Gravity
