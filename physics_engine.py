@@ -10,7 +10,8 @@ from vector_math import (
     vec_add, vec_sub, vec_scale, vec_magnitude,
     vec_normalize, vec_distance, vec_distance_sq,
 )
-from config import G, SOFTENING, MIN_DISTANCE
+from config import G, SOFTENING, MIN_DISTANCE, SHATTER_THRESHOLD
+import random
 from body import CelestialBody
 from utils import brighten_color
 
@@ -138,12 +139,10 @@ class PhysicsEngine:
 
     def _handle_collisions(self):
         """
-        Detect overlapping bodies and merge them.
-
-        Merging conserves momentum and combines masses.
-        The larger body absorbs the smaller one.
+        Detect overlapping bodies and merge them, or shatter them if relative velocity is high.
         """
         to_remove = set()
+        new_bodies = []
         n = len(self.bodies)
 
         for i in range(n):
@@ -157,18 +156,66 @@ class PhysicsEngine:
 
                 dist = vec_distance(bi.position, bj.position)
                 if dist < (bi.radius + bj.radius):
-                    # Merge: the heavier body absorbs the lighter one
-                    if bi.mass >= bj.mass:
-                        self._merge(bi, bj)
-                        to_remove.add(j)
-                    else:
-                        self._merge(bj, bi)
-                        to_remove.add(i)
-                        break  # bi is gone; stop checking against it
+                    # Check relative velocity for shatter mechanics
+                    rel_vx = bi.velocity[0] - bj.velocity[0]
+                    rel_vy = bi.velocity[1] - bj.velocity[1]
+                    relative_v = math.hypot(rel_vx, rel_vy)
 
-        # Remove absorbed bodies (iterate in reverse to keep indices valid)
+                    if relative_v > SHATTER_THRESHOLD and bi.body_type != "Asteroid" and bj.body_type != "Asteroid":
+                        self._shatter(bi, bj, new_bodies)
+                        to_remove.add(i)
+                        to_remove.add(j)
+                        break
+                    else:
+                        # Merge: the heavier body absorbs the lighter one
+                        if bi.mass >= bj.mass:
+                            self._merge(bi, bj)
+                            to_remove.add(j)
+                        else:
+                            self._merge(bj, bi)
+                            to_remove.add(i)
+                            break  # bi is gone; stop checking against it
+
+        # Remove absorbed/shattered bodies (iterate in reverse to keep indices valid)
         for idx in sorted(to_remove, reverse=True):
             self.bodies.pop(idx)
+        
+        # Spawn new asteroids
+        self.bodies.extend(new_bodies)
+
+    @staticmethod
+    def _shatter(b1, b2, new_bodies_queue):
+        """
+        Shatter two colliding bodies into multiple asteroids, conserving momentum.
+        """
+        total_mass = b1.mass + b2.mass
+        # Center of mass momentum
+        px = b1.mass * b1.velocity[0] + b2.mass * b2.velocity[0]
+        py = b1.mass * b1.velocity[1] + b2.mass * b2.velocity[1]
+        
+        # Center of mass position
+        cx = (b1.mass * b1.position[0] + b2.mass * b2.position[0]) / total_mass
+        cy = (b1.mass * b1.position[1] + b2.mass * b2.position[1]) / total_mass
+        
+        com_vx = px / total_mass
+        com_vy = py / total_mass
+
+        # Generate debris
+        num_asteroids = random.randint(15, 30)
+        for _ in range(num_asteroids):
+            angle = random.uniform(0, 2 * math.pi)
+            speed = random.uniform(5.0, 35.0) 
+            ast_vx = com_vx + math.cos(angle) * speed
+            ast_vy = com_vy + math.sin(angle) * speed
+            
+            asteroid = CelestialBody(
+                cx + math.cos(angle) * (b1.radius + 2), 
+                cy + math.sin(angle) * (b1.radius + 2), 
+                ast_vx, 
+                ast_vy, 
+                body_type="Asteroid"
+            )
+            new_bodies_queue.append(asteroid)
 
     @staticmethod
     def _merge(survivor, absorbed):

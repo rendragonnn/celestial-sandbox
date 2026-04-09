@@ -7,6 +7,7 @@ physics engine, renderer, camera, UI panel, and debug tools.
 
 import sys
 import pygame
+import asyncio
 
 from config import (
     WINDOW_WIDTH, WINDOW_HEIGHT, FPS, TITLE, DT_BASE,
@@ -82,7 +83,7 @@ class Simulation:
 
     # ── Main Loop ─────────────────────────────────────────────────────────
 
-    def run(self):
+    async def run(self):
         """Main game loop."""
         while self.running:
             dt = self.clock.tick(FPS) / 1000.0  # seconds since last frame
@@ -92,6 +93,7 @@ class Simulation:
             self._draw()
 
             pygame.display.flip()
+            await asyncio.sleep(0)  # Required for Pygbag browser rendering
 
         pygame.quit()
         sys.exit()
@@ -373,4 +375,4 @@ class Simulation:
 
 if __name__ == "__main__":
     sim = Simulation()
-    sim.run()
+    asyncio.run(sim.run())

@@ -19,6 +19,7 @@ SOFTENING = 5.0     # Softening factor to prevent division-by-zero singularities
 MIN_DISTANCE = 10.0 # Minimum distance for force computation
 DT_BASE = 0.1       # Base timestep
 MAX_TRAIL_LENGTH = 300  # Maximum trail history per body
+SHATTER_THRESHOLD = 45.0 # Minimum relative velocity to trigger shatter instead of merge
 
 # ─── Color Palette ────────────────────────────────────────────────────────────
 COLOR_BLACK      = (0, 0, 0)
@@ -87,6 +88,15 @@ BODY_TYPES = {
         "radius_range": (15, 25),
         "colors": [
             (20, 0, 40),      # deep void
+        ],
+    },
+    "Asteroid": {
+        "mass_range": (1, 5),
+        "radius_range": (1, 2),
+        "colors": [
+            (255, 100, 50),   # fiery red
+            (255, 200, 50),   # yellow heat
+            (120, 120, 120),  # rocky ash
         ],
     },
 }
